@@ -9,7 +9,22 @@ from cogs.rocketleague import RocketLeague
 
 load_dotenv()
 
-bot = commands.Bot(command_prefix='!', case_insensitive=True, help_command=None)
+
+class CustomHelpCommand(commands.HelpCommand):
+    def __init__(self):
+        super().__init__()
+        self.descriptions = {'ranks': 'Xbox: !ranks xbl <gamertag>\n'
+                                      'Playstation: !ranks psn <onlineid>\n'
+                                      'Epic: !ranks epic <username>\n'
+                                      'Steam: !ranks steam <steamid>'}
+
+    async def send_command_help(self, command):
+        embed = discord.Embed(title=f'!{command} help',
+                              description=self.descriptions[str(command)])
+        await self.get_destination().send(embed=embed)
+
+
+bot = commands.Bot(command_prefix='!', case_insensitive=True, help_command=CustomHelpCommand())
 
 
 @bot.event

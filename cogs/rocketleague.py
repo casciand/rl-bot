@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 
 import discord
 from discord.ext import commands
+import asyncio
 
 
 load_dotenv()
@@ -28,7 +29,7 @@ class RocketLeague(commands.Cog):
 
             keys = list(player_ranks.keys())
 
-            embed = discord.Embed(title=f'{username}\'s ranks:', description=f'Season {current_season - 14}')
+            embed = discord.Embed(title=f'{username}\'s ranks:', description=f'Season {current_season - 14}', color=discord.Colour.dark_purple())
             embed.set_thumbnail(url=avatar_url)
 
             for i in range(len(keys)):
@@ -42,4 +43,17 @@ class RocketLeague(commands.Cog):
         except:
             await ctx.send('Invalid platform/name. Please try again.')
             print(f'Failed to retrieve {username}\'s ranks')
+
+    @commands.command(aliases=['bakkes'])
+    async def bakkesmod(self, ctx):
+        link = 'https://www.bakkesmod.com/'
+        await ctx.send(f'Bakkesmod is a mod for Rocket League that adds a wide variety of features to the game including customized '
+                       f'training, client-side access to all cosmetic items, and the ability to see real-time MMR in-game\n'
+                       f'Bakkesmod can be downloaded here: {link}')
+
+    @commands.command()
+    async def goal(self, ctx):
+        for _ in range(3):
+            await ctx.send('What a save!')
+            await asyncio.sleep(.2)
 

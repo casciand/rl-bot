@@ -58,7 +58,6 @@ class SteamFetcher:
             response = requests.get(link)
             json_response = json.loads(response.text)
             self.json_response = json_response
-            print(json_response)
         except:
             print('SteamFetcher not initialized with attribute: json_response')
 
