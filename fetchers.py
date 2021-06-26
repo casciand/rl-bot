@@ -3,6 +3,7 @@ import json
 import requests
 
 from dotenv import load_dotenv
+import discord
 
 
 load_dotenv()
@@ -45,6 +46,47 @@ class TRNFetcher:
             player_ranks[gamemode] = [rank, division, mmr]
 
         return player_ranks
+
+    def get_highest_percentile(self):
+        best_gamemode = ''
+        best_percentile = -1
+
+        for i in range(1, 9):
+            percentile = self.json_response['data']['segments'][i]['stats']['tier']['percentile']
+            gamemode = self.json_response['data']['segments'][i]['metadata']['name']
+
+            if percentile is not None and percentile > best_percentile:
+                best_percentile = percentile
+                best_gamemode = gamemode
+
+        return best_percentile, best_gamemode
+
+    def get_rank_color(self):
+        highest_value = -1
+
+        for i in range(1, 9):
+            value = self.json_response['data']['segments'][i]['stats']['tier']['value']
+
+            if value is not None and value > highest_value:
+                highest_value = value
+        if highest_value >= 22:
+            color = discord.Colour.from_rgb(246, 246, 246)  # silver
+        elif highest_value >= 19:
+            color = discord.Colour.from_rgb(244, 16, 69)  # light red
+        elif highest_value >= 16:
+            color = discord.Colour.from_rgb(144, 96, 216)  # light purple
+        elif highest_value >= 13:
+            color = discord.Colour.from_rgb(10, 117, 255)  # dark blue
+        elif highest_value >= 10:
+            color = discord.Colour.from_rgb(168, 235, 252)  # light blue
+        elif highest_value >= 7:
+            color = discord.Colour.from_rgb(210, 165, 40)  # gold
+        elif highest_value >= 4:
+            color = discord.Colour.from_rgb(122, 122, 122)  # silver
+        else:
+            color = discord.Colour.from_rgb(119, 63, 2)  # bronze
+
+        return color
 
 
 class SteamFetcher:
