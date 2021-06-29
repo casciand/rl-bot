@@ -25,7 +25,10 @@ Run the bot using
 ```commandline
 python3 bot.py
 ```
-or `python bot.py`
+or 
+```commandline
+python bot.py
+```
 
 ## Architecture
 

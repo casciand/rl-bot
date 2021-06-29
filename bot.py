@@ -29,7 +29,8 @@ bot = commands.Bot(command_prefix=['!', '-'], case_insensitive=True, help_comman
 
 @bot.event
 async def on_ready():
-    await bot.change_presence(status=discord.Status.online)
+    await bot.change_presence(status=discord.Status.online,
+                              activity=discord.Game(name='https://github.com/casciand/vga-bot'))
     print(f'{bot.user.name} is online.')
 
 
