@@ -16,6 +16,8 @@ load_dotenv()  # load env variables
 CONNECTION_URL = os.environ['CONNECTION_URL']
 GUILD_IDS = [756176094335467601, 852338789506613278]
 
+#VGAID: 756176094335467601
+
 
 def create_embed(trn_fetcher, identifier):
     player_ranks = trn_fetcher.get_ranks()
@@ -46,7 +48,7 @@ class RocketLeague(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @cog_ext.cog_slash(description='Retrieve a players Rocket League ranks!', guild_ids=GUILD_IDS)
+    @cog_ext.cog_slash(description='Retrieve a players Rocket League ranks! No arguments needed if you have used /linkrl.', guild_ids=GUILD_IDS)
     async def rlranks(self, ctx, platform=None, *, identifier=None):
         if not (platform or identifier):
             collection = initiate_cluster(CONNECTION_URL)
@@ -79,7 +81,7 @@ class RocketLeague(commands.Cog):
             await ctx.send('Updated rank link.')
         else:
             create_user(collection, ctx.author.id, platform, identifier)
-            await ctx.send('Your ranks have been linked to your account.')
+            await ctx.send('Your ranks have been linked successfully.')
 
     @cog_ext.cog_slash(name='bakkes', description='Plug for Bakkesmod.', guild_ids=GUILD_IDS)
     async def bakkesmod(self, ctx):
