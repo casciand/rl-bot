@@ -14,7 +14,7 @@ load_dotenv()  # load env variables
 
 
 CONNECTION_URL = os.environ['CONNECTION_URL']
-GUILD_IDS = [852338789506613278]
+GUILD_IDS = [756176094335467601, 852338789506613278]
 
 
 def create_embed(trn_fetcher, identifier):

@@ -11,8 +11,6 @@ from cogs.rocketleague import RocketLeague
 load_dotenv()  # load env variables
 
 
-GUILD_IDS = [852338789506613278]
-
 bot = commands.Bot(command_prefix='!', intents=discord.Intents.all())
 slash = SlashCommand(bot, sync_commands=True)
 
