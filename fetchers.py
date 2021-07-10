@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 import discord
 
 
-load_dotenv()
+load_dotenv()  # load env variables
 
 
 class TRNFetcher:
