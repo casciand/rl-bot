@@ -3,28 +3,18 @@ from dotenv import load_dotenv
 
 import discord
 from discord.ext import commands
+from discord_slash import SlashCommand
 
 from cogs.rocketleague import RocketLeague
 
 
-load_dotenv()
+load_dotenv()  # load env variables
 
 
-class CustomHelpCommand(commands.HelpCommand):
-    def __init__(self):
-        super().__init__()
-        self.descriptions = {'ranks': 'Xbox: xbl <gamertag>\n'
-                                      'Playstation: psn <onlineid>\n'
-                                      'Epic: epic <username>\n'
-                                      'Steam: steam <steamid>'}
+GUILD_IDS = [852338789506613278]
 
-    async def send_command_help(self, command):
-        embed = discord.Embed(title=f'!{command} help',
-                              description=self.descriptions[str(command)])
-        await self.get_destination().send(embed=embed)
-
-
-bot = commands.Bot(command_prefix=['!', '-'], case_insensitive=True, help_command=CustomHelpCommand())
+bot = commands.Bot(command_prefix='!', intents=discord.Intents.all())
+slash = SlashCommand(bot, sync_commands=True)
 
 
 @bot.event

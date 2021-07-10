@@ -15,9 +15,8 @@ class TRNFetcher:
         self.username = username
 
         link = f'https://api.tracker.gg/api/v2/rocket-league/standard/profile/{self.platform}/{self.username}'
-        api_key = os.environ['TRN_API_KEY']
         headers = {
-            'TRN-Api-Key': api_key,
+            'TRN-Api-Key': os.environ['TRN_API_KEY'],
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36'
         }
 
