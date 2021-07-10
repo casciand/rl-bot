@@ -1,3 +1,4 @@
-discord
-python-dotenv
-requests
+discord~=1.0.1
+python-dotenv~=0.10.5
+requests~=2.25.1
+pymongo~=3.11.4
