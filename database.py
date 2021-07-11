@@ -1,6 +1,7 @@
 from pymongo import MongoClient
 
 
+# establishes a connection with the database
 def initiate_cluster(CONNECTION_URL):
     cluster = MongoClient(CONNECTION_URL)
 

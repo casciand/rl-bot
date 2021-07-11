@@ -10,22 +10,23 @@ load_dotenv()  # load env variables
 
 
 class TRNFetcher:
-    def __init__(self, platform, username):
+    def __init__(self, platform, identifier):
         self.platform = platform
-        self.username = username
+        self.identifier = identifier
 
-        link = f'https://api.tracker.gg/api/v2/rocket-league/standard/profile/{self.platform}/{self.username}'
+        link = f'https://api.tracker.gg/api/v2/rocket-league/standard/profile/{self.platform}/{self.identifier}'
         headers = {
             'TRN-Api-Key': os.environ['TRN_API_KEY'],
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36'
         }
 
-        try:
-            response = requests.get(link, headers=headers)
-            json_response = json.loads(response.text)
-            self.json_response = json_response
-        except:
-            print('TRNFetcher not initialized with attribute: json_response')
+        response = requests.get(link, headers=headers)
+        json_response = json.loads(response.text)
+
+        self.json_response = json_response
+
+    def get_username(self):
+        return self.json_response['data']['platformInfo']['platformUserHandle']
 
     def get_current_season(self):
         return self.json_response['data']['metadata']['currentSeason']
@@ -46,7 +47,7 @@ class TRNFetcher:
 
         return player_ranks
 
-    def get_highest_percentile(self):
+    def get_best_gamemode(self):
         best_gamemode = ''
         best_percentile = -1
 
