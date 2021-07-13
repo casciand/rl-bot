@@ -21,43 +21,55 @@ class TRNFetcher:
         }
 
         response = requests.get(link, headers=headers)
-        json_response = json.loads(response.text)
-
-        self.json_response = json_response
+        self.response = json.loads(response.text)
 
     def get_username(self):
-        return self.json_response['data']['platformInfo']['platformUserHandle']
+        return self.response['data']['platformInfo']['platformUserHandle']
 
     def get_current_season(self):
-        return self.json_response['data']['metadata']['currentSeason']
+        return self.response['data']['metadata']['currentSeason']
 
     def get_pfp(self):
-        return self.json_response['data']['platformInfo']['avatarUrl']
+        return self.response['data']['platformInfo']['avatarUrl']
 
     def get_ranks(self):
-        player_ranks = {}
+        ranks = {}
 
-        for i in range(1, 9):
-            gamemode = self.json_response['data']['segments'][i]['metadata']['name']
-            rank = self.json_response['data']['segments'][i]['stats']['tier']['metadata']['name']
-            division = self.json_response['data']['segments'][i]['stats']['division']['metadata']['name']
-            mmr = self.json_response['data']['segments'][i]['stats']['rating']['value']
+        for i in range(1, 10):
+            try:
+                playlist = self.response['data']['segments'][i]
+                gamemode = playlist['metadata']['name']
 
-            player_ranks[gamemode] = [rank, division, mmr]
+                rank = playlist['stats']['tier']['metadata']['name']
+                division = playlist['stats']['division']['metadata']['name']
+                mmr = playlist['stats']['rating']['value']
 
-        return player_ranks
+                stats = {'rank': rank,
+                         'division': division,
+                         'mmr': mmr}
+
+                ranks[gamemode] = stats
+            except IndexError:
+                continue
+
+        return ranks
 
     def get_best_gamemode(self):
         best_gamemode = ''
-        best_percentile = -1
+        best_percentile = 0
 
-        for i in range(1, 9):
-            percentile = self.json_response['data']['segments'][i]['stats']['tier']['percentile']
-            gamemode = self.json_response['data']['segments'][i]['metadata']['name']
+        for i in range(1, 10):
+            try:
+                playlist = self.response['data']['segments'][i]
 
-            if percentile is not None and percentile > best_percentile:
-                best_percentile = percentile
-                best_gamemode = gamemode
+                percentile = playlist['stats']['tier']['percentile']
+                gamemode = playlist['metadata']['name']
+
+                if percentile is not None and percentile > best_percentile:
+                    best_percentile = percentile
+                    best_gamemode = gamemode
+            except IndexError:
+                continue
 
         return best_percentile, best_gamemode
 
@@ -65,7 +77,7 @@ class TRNFetcher:
         highest_value = -1
 
         for i in range(1, 9):
-            value = self.json_response['data']['segments'][i]['stats']['tier']['value']
+            value = self.response['data']['segments'][i]['stats']['tier']['value']
 
             if value is not None and value > highest_value:
                 highest_value = value
@@ -96,12 +108,8 @@ class SteamFetcher:
         api_key = os.environ['STEAM_API_KEY']
         link = f'http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key={api_key}&steamids={self.steamid}'
 
-        try:
-            response = requests.get(link)
-            json_response = json.loads(response.text)
-            self.json_response = json_response
-        except:
-            print('SteamFetcher not initialized with attribute: json_response')
+        response = requests.get(link)
+        self.response = json.loads(response.text)
 
     def get_username(self):
-        return self.json_response['response']['players'][0]['personaname']
+        return self.response['response']['players'][0]['personaname']

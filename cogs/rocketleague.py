@@ -14,6 +14,9 @@ load_dotenv()  # load env variables
 
 CONNECTION_URL = os.environ['CONNECTION_URL']
 GUILD_IDS = [756176094335467601, 852338789506613278]
+DESCRIPTIONS = ['Retrieve a players Rocket League ranks! No arguments needed if you have used `/linkrl`.',
+                'Link your Rocket League ranks to your Discord account.',
+                'Plug for Bakkesmod.']
 
 # VGA_ID: 756176094335467601
 
@@ -22,15 +25,20 @@ class RocketLeague(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @cog_ext.cog_slash(description='Retrieve a players Rocket League ranks! No arguments needed if you have used /linkrl.', guild_ids=GUILD_IDS)
+    @cog_ext.cog_slash(description=DESCRIPTIONS[0], guild_ids=GUILD_IDS)
     async def rlranks(self, ctx, platform=None, *, identifier=None):
         if platform is None and identifier is None:  # if user has linked account
             collection = initiate_cluster(CONNECTION_URL)
             query = {'_id': ctx.author.id}
 
             user = collection.find_one(query)
-            platform = user['platform']
-            identifier = user['identifier']
+
+            if user is None:
+                await ctx.send('You don\'t have a linked account, try `/linkrl`')
+                return
+            else:
+                platform = user['platform']
+                identifier = user['identifier']
 
         try:
             trn_fetcher = TRNFetcher(platform, identifier)
@@ -40,7 +48,7 @@ class RocketLeague(commands.Cog):
         except KeyError:
             await ctx.send('User could not be found.')
 
-    @cog_ext.cog_slash(description='Link your Rocket League ranks to your Discord account.', guild_ids=GUILD_IDS)
+    @cog_ext.cog_slash(description=DESCRIPTIONS[1], guild_ids=GUILD_IDS)
     async def linkrl(self, ctx, platform, *, identifier):
         collection = initiate_cluster(CONNECTION_URL)
         query = {'_id': ctx.author.id}
@@ -52,10 +60,9 @@ class RocketLeague(commands.Cog):
             await ctx.send('Updated ranks successfully.')
         else:
             create_user(collection, ctx.author.id, platform, identifier)
-
             await ctx.send('Linked ranks successfully.')
 
-    @cog_ext.cog_slash(name='bakkes', description='Plug for Bakkesmod.', guild_ids=GUILD_IDS)
+    @cog_ext.cog_slash(name='bakkes', description=DESCRIPTIONS[2], guild_ids=GUILD_IDS)
     async def bakkesmod(self, ctx):
         link = 'https://www.bakkesmod.com/download.php'
         await ctx.send(f'Bakkesmod is a mod for Rocket League that adds a wide variety of features to the game including customized '
@@ -65,30 +72,26 @@ class RocketLeague(commands.Cog):
 
 def create_embed(trn_fetcher):
     username = trn_fetcher.get_username()
+    avatar_url = trn_fetcher.get_pfp()
+
     ranks = trn_fetcher.get_ranks()
     current_season = trn_fetcher.get_current_season()
-    avatar_url = trn_fetcher.get_pfp()
     best_percentile, best_gamemode = trn_fetcher.get_best_gamemode()
-
-    keys = list(ranks.keys())
 
     embed = discord.Embed(title=f'{username}\'s ranks:',
                           description=f'Season {current_season - 14}',
                           color=trn_fetcher.get_rank_color())
-    if avatar_url:
-        embed.set_thumbnail(url=avatar_url)
-    else:
-        default_pfp = 'https://images-eds-ssl.xboxlive.com/image?url=8Oaj9Ryq1G1_p3lLnXlsaZgGzAie6Mnu24_PawYuDYIoH77pJ.X5Z.MqQPibUVTcS9jr0n8i7LY1tL3U7AiafX4CBXlmeNYIlNDtmq5GybCrf_ehzIV6VDRULqrr283j'
-        embed.set_thumbnail(url=default_pfp)
 
-    embed.set_footer(text=f'You are in the top {100 - best_percentile:.2f}% in {best_gamemode}!')
-
-    for i in range(len(keys)):
-        gamemode = keys[i]
-
+    for gamemode in list(ranks.keys()):
         if gamemode != 'Un-Ranked':
             embed.add_field(name=gamemode,
-                            value=f'{ranks[gamemode][0]}, {ranks[gamemode][1]} ({ranks[gamemode][2]})',
+                            value=f"{ranks[gamemode]['rank']}, {ranks[gamemode]['division']} ({ranks[gamemode]['mmr']})",
                             inline=False)
+
+    if avatar_url is None:
+        avatar_url = 'https://images-eds-ssl.xboxlive.com/image?url=8Oaj9Ryq1G1_p3lLnXlsaZgGzAie6Mnu24_PawYuDYIoH77pJ.X5Z.MqQPibUVTcS9jr0n8i7LY1tL3U7AiafX4CBXlmeNYIlNDtmq5GybCrf_ehzIV6VDRULqrr283j'
+
+    embed.set_thumbnail(url=avatar_url)
+    embed.set_footer(text=f'You are in the top {100 - best_percentile:.2f}% in {best_gamemode}!')
 
     return embed
