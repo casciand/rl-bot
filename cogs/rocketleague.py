@@ -14,7 +14,8 @@ load_dotenv()  # load env variables
 
 CONNECTION_URL = os.environ['CONNECTION_URL']
 GUILD_IDS = [756176094335467601, 852338789506613278]
-DESCRIPTIONS = ['Retrieve a players Rocket League ranks! No arguments needed if you have used `/linkrl`.',
+DESCRIPTIONS = ['Retrieve a player\'s Rocket League ranks!',
+                'Retrieve a linked player\'s Rocket League ranks!',
                 'Link your Rocket League ranks to your Discord account.',
                 'Plug for Bakkesmod.']
 
@@ -26,20 +27,7 @@ class RocketLeague(commands.Cog):
         self.bot = bot
 
     @cog_ext.cog_slash(description=DESCRIPTIONS[0], guild_ids=GUILD_IDS)
-    async def rlranks(self, ctx, platform=None, *, identifier=None):
-        if platform is None and identifier is None:  # if user has linked account
-            collection = initiate_cluster(CONNECTION_URL)
-            query = {'_id': ctx.author.id}
-
-            user = collection.find_one(query)
-
-            if user is None:
-                await ctx.send('You don\'t have a linked account, try `/linkrl`')
-                return
-            else:
-                platform = user['platform']
-                identifier = user['identifier']
-
+    async def ranks(self, ctx, platform, *, identifier):
         try:
             trn_fetcher = TRNFetcher(platform, identifier)
             embed = create_embed(trn_fetcher)
@@ -49,7 +37,32 @@ class RocketLeague(commands.Cog):
             await ctx.send('User could not be found.')
 
     @cog_ext.cog_slash(description=DESCRIPTIONS[1], guild_ids=GUILD_IDS)
-    async def linkrl(self, ctx, platform, *, identifier):
+    async def myranks(self, ctx, mention: discord.User=None):
+        collection = initiate_cluster(CONNECTION_URL)
+
+        if mention is None:
+            query = {'_id': ctx.author.id}
+        else:
+            query = {'_id': mention.id}
+
+        user = collection.find_one(query)
+
+        if user is None:
+            await ctx.send('You don\'t have a linked account, try `/link` first.')
+        else:
+            platform = user['platform']
+            identifier = user['identifier']
+
+            try:
+                trn_fetcher = TRNFetcher(platform, identifier)
+                embed = create_embed(trn_fetcher)
+
+                await ctx.send(embed=embed)
+            except KeyError:
+                await ctx.send('User could not be found.')
+
+    @cog_ext.cog_slash(description=DESCRIPTIONS[2], guild_ids=GUILD_IDS)
+    async def link(self, ctx, platform, *, identifier):
         collection = initiate_cluster(CONNECTION_URL)
         query = {'_id': ctx.author.id}
 
@@ -62,8 +75,8 @@ class RocketLeague(commands.Cog):
             create_user(collection, ctx.author.id, platform, identifier)
             await ctx.send('Linked ranks successfully.')
 
-    @cog_ext.cog_slash(name='bakkes', description=DESCRIPTIONS[2], guild_ids=GUILD_IDS)
-    async def bakkesmod(self, ctx):
+    @cog_ext.cog_slash(description=DESCRIPTIONS[3], guild_ids=GUILD_IDS)
+    async def bakkes(self, ctx):
         link = 'https://www.bakkesmod.com/download.php'
         await ctx.send(f'Bakkesmod is a mod for Rocket League that adds a wide variety of features to the game including customized '
                        f'training, client-side access to all cosmetic items, and the ability to see real-time MMR in-game\n'
