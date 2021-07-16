@@ -53,6 +53,7 @@ class RocketLeague(commands.Cog):
             platform = user['platform']
             identifier = user['identifier']
 
+	    # can't call another command so copied for now
             try:
                 trn_fetcher = TRNFetcher(platform, identifier)
                 embed = create_embed(trn_fetcher)

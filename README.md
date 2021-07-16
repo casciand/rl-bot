@@ -1,10 +1,10 @@
 # a Vanderbilt Gaming Association bot
 
-possibly? needs more features to be complete
+currently has Rocket League capabilities only
 
 ## Developer Setup
 
-the bot requires Python 3.8+.
+This bot is hosted on Heroku and uses MongoDB to track user info.
 
 ### Installation
 
@@ -23,11 +23,11 @@ This is what links the application to your bot profile.
 Run the bot using 
 
 ```commandline
-python3 bot.py
+python bot.py
 ```
 or 
 ```commandline
-python bot.py
+python3 bot.py
 ```
 
 ## Architecture
@@ -36,5 +36,6 @@ python bot.py
 ├── bot.py
 ├── cogs
 │   ├── rocketleague.py
-├── fetchers.by
+├── fetchers.py
+├── database.py
 ```
