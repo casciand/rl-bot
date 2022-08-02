@@ -1,18 +1,15 @@
 import os
-from dotenv import load_dotenv
-
 import discord
 from discord.ext import commands
-from discord_slash import SlashCommand
+from dotenv import load_dotenv
 
 from cogs.rocketleague import RocketLeague
 
 
 load_dotenv()  # load env variables
 
-
-bot = commands.Bot(command_prefix='!', intents=discord.Intents.all())
-slash = SlashCommand(bot, sync_commands=True)
+token = os.environ.get('DISCORD')
+bot = commands.Bot(token=token)
 
 
 @bot.event
@@ -22,5 +19,4 @@ async def on_ready():
 
 
 bot.add_cog(RocketLeague(bot))
-
-bot.run(os.environ['DISCORD'])
+bot.run(token)

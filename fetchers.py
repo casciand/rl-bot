@@ -1,12 +1,14 @@
 import os
 import json
 import requests
+import discord
 
 from dotenv import load_dotenv
-import discord
 
 
 load_dotenv()  # load env variables
+
+TRN_API_KEY = os.environ.get('TRN_API_KEY')
 
 
 class TRNFetcher:
@@ -16,7 +18,7 @@ class TRNFetcher:
 
         link = f'https://api.tracker.gg/api/v2/rocket-league/standard/profile/{self.platform}/{self.identifier}'
         headers = {
-            'TRN-Api-Key': os.environ['TRN_API_KEY'],
+            'TRN-Api-Key': TRN_API_KEY,
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36'
         }
 
@@ -99,17 +101,3 @@ class TRNFetcher:
             color = discord.Colour.from_rgb(119, 63, 2)  # bronze
 
         return color
-
-
-class SteamFetcher:
-    def __init__(self, steamid):
-        self.steamid = steamid
-
-        api_key = os.environ['STEAM_API_KEY']
-        link = f'http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key={api_key}&steamids={self.steamid}'
-
-        response = requests.get(link)
-        self.response = json.loads(response.text)
-
-    def get_username(self):
-        return self.response['response']['players'][0]['personaname']

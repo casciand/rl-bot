@@ -1,41 +1,22 @@
-# a Vanderbilt Gaming Association bot
+## Setup
 
-currently has Rocket League capabilities only
+### Dependencies
 
-## Developer Setup
-
-This bot is hosted on Heroku and uses MongoDB to track user info.
-
-### Installation
-
-Clone the repo by 
-`git clone https://github.com/casciand/vga-bot.git` or use ssh.
-
-`cd` into the repo and do `pip install -r requirements.txt` (or pip3) to install dependencies.
+Install dependencies by running 
+```commandline
+pip install -r requirements.txt
+```
 
 ### Secrets
 
-Create a file named `.env` in the repo and add your discord token to it: `DISCORD=your_token_here`.
-This is what links the application to your bot profile.
+Create a file named `.env` in the project root and add any necessary environment variables (i.e. bot token, api key, firebase credentials, database url).
 
-### Run
+### Deploy
 
-Run the bot using 
+Host the bot locally by running
 
 ```commandline
 python bot.py
 ```
-or 
-```commandline
-python3 bot.py
-```
 
-## Architecture
-
-```
-├── bot.py
-├── cogs
-│   ├── rocketleague.py
-├── fetchers.py
-├── database.py
-```
+Or configure the repo to some third party hosting service such as Heroku.
