@@ -1,4 +1,5 @@
 import discord
+import requests.exceptions
 from discord.ext import commands
 from dotenv import load_dotenv
 
@@ -51,12 +52,17 @@ class RocketLeague(commands.Cog):
     @commands.slash_command(description=DESCRIPTIONS[0], guild_ids=GUILD_IDS)
     async def ranks(self, ctx, platform, *, identifier):
         try:
-            trn_fetcher = TRNFetcher(platform, identifier)
+            try:
+                trn_fetcher = TRNFetcher(platform, identifier)
+            except requests.exceptions.RequestException as e:
+                await ctx.respond(e)
+                return
+
             embed = create_embed(trn_fetcher)
 
-            await ctx.send(embed=embed)
+            await ctx.respond(embed=embed)
         except KeyError:
-            await ctx.send('User could not be found.')
+            await ctx.respond('User could not be found.')
 
     @commands.slash_command(description=DESCRIPTIONS[1], guild_ids=GUILD_IDS)
     async def myranks(self, ctx, mention: discord.User = None):
@@ -65,17 +71,17 @@ class RocketLeague(commands.Cog):
         else:
             user_id = mention.id
 
-        user = get_user(user_id)
+        user = await get_user(user_id)
 
         if user is None:
-            await ctx.send('You don\'t have a linked account, try `/link` first.')
+            await ctx.respond('You don\'t have a linked account, try `/link` first.')
         else:
             platform = user['platform']
             identifier = user['identifier']
 
-            await self.ranks(ctx, platform, identifier)
+            await self.ranks(ctx, platform=platform, identifier=identifier)
 
     @commands.slash_command(description=DESCRIPTIONS[2], guild_ids=GUILD_IDS)
     async def link(self, ctx, platform, *, identifier):
         await create_user(ctx.author.id, platform, identifier)
-        await ctx.send('Linked ranks successfully.')
+        await ctx.respond('Linked ranks successfully.')

@@ -14,14 +14,14 @@ async def get_user(user_id):
     discord_ids = users_ref.get()
 
     for id in discord_ids:
-        if id == user_id:
+        if id == str(user_id):
             return discord_ids[id]
 
     return None
 
 
 async def create_user(user_id, platform, identifier):
-    users_ref.child(user_id).set({
+    users_ref.child(str(user_id)).set({
         'platform': platform,
         'identifier': identifier
     })

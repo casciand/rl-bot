@@ -19,10 +19,11 @@ class TRNFetcher:
         link = f'https://api.tracker.gg/api/v2/rocket-league/standard/profile/{self.platform}/{self.identifier}'
         headers = {
             'TRN-Api-Key': TRN_API_KEY,
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36'
+            # 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36'
         }
 
         response = requests.get(link, headers=headers)
+        response.raise_for_status()  # raise error if bad status code
         self.response = json.loads(response.text)
 
     def get_username(self):
